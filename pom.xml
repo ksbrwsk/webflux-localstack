@@ -10,9 +10,9 @@
     </parent>
     <groupId>de.ksbrwsk</groupId>
     <artifactId>webflux-localstack</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>webflux-localstack</name>
-    <description>Demo project for Spring Boot</description>
+    <description>Example using spring webflux with localstack s3 service.</description>
     <properties>
         <java.version>17</java.version>
         <aws-java-sdk.version>1.12.106</aws-java-sdk.version>

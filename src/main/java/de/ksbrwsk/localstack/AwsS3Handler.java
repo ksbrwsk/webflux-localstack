@@ -14,7 +14,6 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -29,47 +28,46 @@ public class AwsS3Handler {
     Mono<ServerResponse> handleFetchAll(ServerRequest serverRequest) {
         log.info("handle request {} - {}", serverRequest.method(), serverRequest.requestPath());
         List<S3ObjectSummary> s3ObjectSummaries = this.awsS3Service.listObjects();
-        List<AwsS3File> files = new ArrayList<>(s3ObjectSummaries.size());
-        for (S3ObjectSummary sum : s3ObjectSummaries) {
-            files.add(new AwsS3File(sum.getBucketName(), sum.getKey(), sum.getLastModified()));
-        }
         return ok()
                 .bodyValue(s3ObjectSummaries);
     }
 
-    Mono<ServerResponse> downloadFromS3(ServerRequest request) {
-        String name = request.pathVariable("name");
+    Mono<ServerResponse> downloadFromS3(ServerRequest serverRequest) {
+        log.info("handle request {} - {}", serverRequest.method(), serverRequest.requestPath());
+        String name = serverRequest.pathVariable("name");
         InputStreamResource inputStreamResource =
                 new InputStreamResource(awsS3Service.downloadFileFromS3Bucket(name));
-        return ok().contentType(MediaType.APPLICATION_OCTET_STREAM)
+        return ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(BodyInserters.fromResource(inputStreamResource));
     }
 
     Mono<ServerResponse> handleUpload(ServerRequest serverRequest) {
+        log.info("handle request {} - {}", serverRequest.method(), serverRequest.requestPath());
         return serverRequest
                 .multipartData()
                 .flatMap(
-                        pMultiValueMap -> {
-                            List<Part> file = pMultiValueMap.get("files");
+                        multiValueMap -> {
+                            List<Part> file = multiValueMap.get("files");
                             Flux<String> uploadResult =
                                     Flux.fromIterable(file)
                                             .cast(FilePart.class)
                                             .flatMap(
-                                                    pFilePart -> {
-                                                        String fileName = pFilePart.filename();
-                                                        return pFilePart
+                                                    filePart -> {
+                                                        String fileName = filePart.filename();
+                                                        return filePart
                                                                 .content()
                                                                 .filter(
-                                                                        pDataBuffer ->
-                                                                                new byte[pDataBuffer.readableByteCount()].length > 0)
+                                                                        dataBuffer ->
+                                                                                new byte[dataBuffer.readableByteCount()].length > 0)
                                                                 .flatMap(
-                                                                        pDataBuffer -> {
+                                                                        dataBuffer -> {
                                                                             log.info("Upload file '{}' started", fileName);
 
                                                                             String etag = "";
                                                                             try {
-                                                                                byte[] data = new byte[pDataBuffer.readableByteCount()];
-                                                                                pDataBuffer.read(data);
+                                                                                byte[] data = new byte[dataBuffer.readableByteCount()];
+                                                                                dataBuffer.read(data);
                                                                                 etag = awsS3Service.uploadObjectToS3(fileName, data);
                                                                                 log.info("Upload file '{}' finished", fileName);
                                                                             } catch (Exception ex) {
@@ -80,7 +78,9 @@ public class AwsS3Handler {
 
                                                                         });
                                                     });
-                            return ok().contentType(APPLICATION_JSON).body(uploadResult, String.class);
+                            return ok()
+                                    .contentType(APPLICATION_JSON)
+                                    .body(uploadResult, String.class);
                         });
     }
 }
