@@ -1,0 +1,8 @@
+config:
+  aws:
+    region: eu-central-1
+    s3:
+      url: http://127.0.0.1:4566
+      bucket-name: sabo-s3-bucket
+      access-key: test
+      secret-key: test
