@@ -13,7 +13,7 @@
 
 ### Install Localstack and awslocal-cli:
 ```bash
-pip install localstack
+pip install localstack   #pip command depends on Python version, can be pip3 
 pip install awscli-local
 ```
 
