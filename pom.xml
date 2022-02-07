@@ -16,7 +16,7 @@
     <properties>
         <java.version>17</java.version>
         <testcontainers.version>1.16.3</testcontainers.version>
-        <aws-java-sdk.version>1.12.146</aws-java-sdk.version>
+        <aws-java-sdk.version>1.12.153</aws-java-sdk.version>
         <jaxb-api.version>2.3.1</jaxb-api.version>
         <commons-io.version>2.11.0</commons-io.version>
     </properties>
