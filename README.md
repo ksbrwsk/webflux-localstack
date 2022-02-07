@@ -1,6 +1,6 @@
 ## webflux-localstack
 
-### Example using Spring webflux on localstack s3 service.
+### Example using Spring webflux on localstack s3 service and localstack testcontainer.
 
 ### Prerequisites:
 
