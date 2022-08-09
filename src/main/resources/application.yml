@@ -5,3 +5,4 @@ cloud:
       url: http://127.0.0.1:4566
       access-key: test
       secret-key: test
+      bucket-name: sabo-s3-bucket

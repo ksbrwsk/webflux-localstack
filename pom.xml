@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.0-M1</version>
+        <version>3.0.0-SNAPSHOT</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>de.ksbrwsk</groupId>
@@ -15,8 +15,8 @@
     <description>Example using spring webflux with localstack s3 service.</description>
     <properties>
         <java.version>17</java.version>
-        <testcontainers.version>1.16.3</testcontainers.version>
-        <aws-java-sdk.version>1.12.153</aws-java-sdk.version>
+        <testcontainers.version>1.17.1</testcontainers.version>
+        <aws-java-sdk.version>1.12.276</aws-java-sdk.version>
         <jaxb-api.version>2.3.1</jaxb-api.version>
         <commons-io.version>2.11.0</commons-io.version>
     </properties>
@@ -28,6 +28,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
+            <version>2.7.2</version>
             <optional>true</optional>
         </dependency>
         <dependency>
