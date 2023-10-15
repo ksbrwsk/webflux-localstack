@@ -1,5 +1,8 @@
 package de.ksbrwsk.localstack;
 
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
@@ -7,6 +10,7 @@ import com.amazonaws.services.s3.model.S3ObjectSummary;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -33,22 +37,37 @@ class AwsS3ServiceTest {
     private static AwsS3Service awsS3Service;
 
     @Container
+    @ServiceConnection
     static LocalStackContainer localStack =
-            new LocalStackContainer(DockerImageName.parse("localstack/localstack:0.14.0"))
+            new LocalStackContainer(DockerImageName.parse("localstack/localstack:2.3.2"))
                     .withServices(S3)
                     .withReuse(true);
 
-    @DynamicPropertySource
-    static void overrideConfiguration(DynamicPropertyRegistry registry) {
-        registry.add("cloud.aws.credentials.access-key", localStack::getAccessKey);
-        registry.add("cloud.aws.credentials.secret-key", localStack::getSecretKey);
-    }
+//    @DynamicPropertySource
+//    static void overrideConfiguration(DynamicPropertyRegistry registry) {
+//        registry.add("cloud.aws.credentials.access-key", localStack::getAccessKey);
+//        registry.add("cloud.aws.credentials.secret-key", localStack::getSecretKey);
+//    }
 
     @BeforeAll
     public static void setup() {
+//        amazonS3 = AmazonS3ClientBuilder
+//                .standard()
+//                //.withEndpointConfiguration(localStack.getEndpointConfiguration(S3))
+//                .build();
         amazonS3 = AmazonS3ClientBuilder
                 .standard()
-                .withEndpointConfiguration(localStack.getEndpointConfiguration(S3))
+                .withEndpointConfiguration(
+                        new AwsClientBuilder.EndpointConfiguration(
+                                localStack.getEndpoint().toString(),
+                                localStack.getRegion()
+                        )
+                )
+                .withCredentials(
+                        new AWSStaticCredentialsProvider(
+                                new BasicAWSCredentials(localStack.getAccessKey(), localStack.getSecretKey())
+                        )
+                )
                 .build();
         amazonS3.createBucket("sabo-s3-bucket");
         awsS3Service = new AwsS3Service(amazonS3);

@@ -4,7 +4,7 @@
 
 ### Prerequisites:
 
-* [Java 17](https://adoptium.net/)
+* [Java 21](https://adoptium.net/)
 * [Apache Maven](https:http://maven.apache.org/)
 * [Docker](https://www.docker.com/)
 * [Python](https://www.python.org/)
@@ -62,7 +62,7 @@ config:
 ### Build & run the application
 ```bash
 ./mvnw package
-java -jar ./target/weflux-localstack-1.0.0.jar
+java -jar ./target/weflux-localstack-2.1.0.jar
 ```
 ### Upload file eg (using HTTPie)
 ```bash

@@ -5,17 +5,17 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.1.4</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>de.ksbrwsk</groupId>
     <artifactId>webflux-localstack</artifactId>
-    <version>2.0.0-SNAPSHOT</version>
+    <version>2.1.0-SNAPSHOT</version>
     <name>webflux-localstack</name>
     <description>Example using spring webflux with localstack s3 service.</description>
     <properties>
-        <java.version>17</java.version>
-        <testcontainers.version>1.17.1</testcontainers.version>
+        <java.version>21</java.version>
+        <testcontainers.version>1.19.1</testcontainers.version>
         <aws-java-sdk.version>1.12.276</aws-java-sdk.version>
         <jaxb-api.version>2.3.1</jaxb-api.version>
         <commons-io.version>2.11.0</commons-io.version>
@@ -28,7 +28,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
-            <version>2.7.2</version>
             <optional>true</optional>
         </dependency>
         <dependency>
@@ -70,6 +69,12 @@
             <groupId>org.testcontainers</groupId>
             <artifactId>localstack</artifactId>
             <version>${testcontainers.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-testcontainers</artifactId>
+            <version>3.1.4</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
