@@ -18,7 +18,7 @@
         <testcontainers.version>1.19.1</testcontainers.version>
         <aws-java-sdk.version>1.12.566</aws-java-sdk.version>
         <jaxb-api.version>2.3.1</jaxb-api.version>
-        <commons-io.version>2.11.0</commons-io.version>
+        <commons-io.version>2.14.0</commons-io.version>
     </properties>
     <dependencies>
         <dependency>
