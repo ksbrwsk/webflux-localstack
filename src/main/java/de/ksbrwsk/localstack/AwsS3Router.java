@@ -9,9 +9,18 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import static org.springframework.web.reactive.function.server.RouterFunctions.nest;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
+/**
+ * Configuration class for AWS S3 Router.
+ * This class is responsible for defining the routes for AWS S3 operations.
+ */
 @Configuration
 public class AwsS3Router {
 
+    /**
+     * Defines the routes for AWS S3 operations.
+     * @param s3Handler The handler for AWS S3 operations
+     * @return RouterFunction instance
+     */
     @Bean
     RouterFunction<ServerResponse> http(AwsS3Handler s3Handler) {
         return nest(path("/api/s3"),

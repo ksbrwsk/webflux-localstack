@@ -19,12 +19,22 @@ import java.util.List;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 
+/**
+ * Handler class for AWS S3 operations.
+ * This class is responsible for handling requests related to AWS S3 operations.
+ */
 @Component
 @Slf4j
 @RequiredArgsConstructor
 public class AwsS3Handler {
+    // AWS S3 service instance
     private final AwsS3Service awsS3Service;
 
+    /**
+     * Handles the request to fetch all objects in the AWS S3 bucket.
+     * @param serverRequest The server request
+     * @return ServerResponse instance
+     */
     Mono<ServerResponse> handleFetchAll(ServerRequest serverRequest) {
         log.info("handle request {} - {}", serverRequest.method(), serverRequest.requestPath());
         List<S3ObjectSummary> s3ObjectSummaries = this.awsS3Service.listObjects();
@@ -32,6 +42,11 @@ public class AwsS3Handler {
                 .bodyValue(s3ObjectSummaries);
     }
 
+    /**
+     * Handles the request to download a file from the AWS S3 bucket.
+     * @param serverRequest The server request
+     * @return ServerResponse instance
+     */
     Mono<ServerResponse> downloadFromS3(ServerRequest serverRequest) {
         log.info("handle request {} - {}", serverRequest.method(), serverRequest.requestPath());
         String name = serverRequest.pathVariable("name");
@@ -42,6 +57,11 @@ public class AwsS3Handler {
                 .body(BodyInserters.fromResource(inputStreamResource));
     }
 
+    /**
+     * Handles the request to upload a file to the AWS S3 bucket.
+     * @param serverRequest The server request
+     * @return ServerResponse instance
+     */
     Mono<ServerResponse> handleUpload(ServerRequest serverRequest) {
         log.info("handle request {} - {}", serverRequest.method(), serverRequest.requestPath());
         return serverRequest

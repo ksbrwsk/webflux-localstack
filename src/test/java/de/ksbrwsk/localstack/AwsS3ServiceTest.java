@@ -12,8 +12,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.localstack.LocalStackContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -33,29 +31,18 @@ class AwsS3ServiceTest {
     private static final String EXAMPLE_TXT = "example_txt.txt";
     private static final String EXAMPLE_CSV = "example_csv.csv";
 
-    private static AmazonS3 amazonS3;
     private static AwsS3Service awsS3Service;
 
     @Container
     @ServiceConnection
-    static LocalStackContainer localStack =
-            new LocalStackContainer(DockerImageName.parse("localstack/localstack:2.3.2"))
+    static final LocalStackContainer localStack =
+            new LocalStackContainer(DockerImageName.parse("localstack/localstack:3.0.2"))
                     .withServices(S3)
                     .withReuse(true);
 
-//    @DynamicPropertySource
-//    static void overrideConfiguration(DynamicPropertyRegistry registry) {
-//        registry.add("cloud.aws.credentials.access-key", localStack::getAccessKey);
-//        registry.add("cloud.aws.credentials.secret-key", localStack::getSecretKey);
-//    }
-
     @BeforeAll
     public static void setup() {
-//        amazonS3 = AmazonS3ClientBuilder
-//                .standard()
-//                //.withEndpointConfiguration(localStack.getEndpointConfiguration(S3))
-//                .build();
-        amazonS3 = AmazonS3ClientBuilder
+        AmazonS3 amazonS3 = AmazonS3ClientBuilder
                 .standard()
                 .withEndpointConfiguration(
                         new AwsClientBuilder.EndpointConfiguration(
