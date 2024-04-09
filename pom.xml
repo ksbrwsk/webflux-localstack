@@ -17,7 +17,7 @@
         <java.version>21</java.version>
         <aws-java-sdk.version>1.12.658</aws-java-sdk.version>
         <jaxb-api.version>2.3.1</jaxb-api.version>
-        <commons-io.version>2.15.1</commons-io.version>
+        <commons-io.version>2.16.1</commons-io.version>
     </properties>
     <dependencies>
         <dependency>
