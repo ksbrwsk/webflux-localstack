@@ -1,77 +1,112 @@
 package de.ksbrwsk.localstack;
 
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import io.awspring.cloud.core.region.StaticRegionProvider;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+
+import java.net.URI;
 
 /**
  * Configuration class for AWS S3.
- * This class is responsible for creating and configuring the AmazonS3 bean.
+ * This class sets up the necessary AWS S3 credentials and configurations.
  */
 @Configuration
 @Data
+@Slf4j
 public class AwsS3Config {
 
-    // AWS region
+    /**
+     * AWS region.
+     */
     @Value("${cloud.aws.region}")
     private String region;
 
-    // AWS S3 endpoint URL
+    /**
+     * AWS S3 endpoint URL.
+     */
     @Value("${cloud.aws.s3.url}")
     private String s3EndpointUrl;
 
-    // AWS S3 bucket name
+    /**
+     * AWS S3 bucket name.
+     */
     @Value("${cloud.aws.s3.bucket-name}")
     private String bucketName;
 
-    // AWS S3 access key
+    /**
+     * AWS S3 access key.
+     */
     @Value("${cloud.aws.s3.access-key}")
     private String accessKey;
 
-    // AWS S3 secret key
+    /**
+     * AWS S3 secret key.
+     */
     @Value("${cloud.aws.s3.secret-key}")
     private String secretKey;
 
-    /**
-     * Creates and configures the AmazonS3 bean.
-     * @return AmazonS3 instance
-     */
-    @Bean(name = "amazonS3")
-    public AmazonS3 amazonS3() {
-        return AmazonS3ClientBuilder.standard()
-                .withCredentials(getCredentialsProvider())
-                .withEndpointConfiguration(getEndpointConfiguration(s3EndpointUrl))
+    @Bean
+    public S3Client s3Client(AwsCredentialsProvider customAwsCredentialsProvider) {
+        return S3Client.builder()
+                .credentialsProvider(customAwsCredentialsProvider)
+                .region(Region.EU_CENTRAL_1)
+                .endpointOverride(URI.create(this.s3EndpointUrl))
                 .build();
     }
 
-    /**
-     * Creates an EndpointConfiguration with the provided URL and the region.
-     * @param url The URL for the endpoint
-     * @return EndpointConfiguration instance
-     */
-    private EndpointConfiguration getEndpointConfiguration(String url) {
-        return new EndpointConfiguration(url, region);
+    @Bean
+    public StaticRegionProvider regionProvider() {
+        return new StaticRegionProvider(this.region);
     }
 
     /**
-     * Creates an AWSStaticCredentialsProvider with the access key and secret key.
-     * @return AWSStaticCredentialsProvider instance
+     * Bean for custom AWS credentials provider.
+     *
+     * @return AwsCredentialsProvider instance with custom AWS credentials.
      */
-    private AWSStaticCredentialsProvider getCredentialsProvider() {
-        return new AWSStaticCredentialsProvider(getBasicAWSCredentials());
+    @Bean
+    public AwsCredentialsProvider customAwsCredentialsProvider() {
+        return new CustomAWSCredentialsProvider(this.accessKey, this.secretKey);
     }
 
     /**
-     * Creates a BasicAWSCredentials with the access key and secret key.
-     * @return BasicAWSCredentials instance
+     * Custom AWS credentials provider class.
+     * This class provides AWS credentials using the provided access key and secret key.
      */
-    private BasicAWSCredentials getBasicAWSCredentials() {
-        return new BasicAWSCredentials(accessKey, secretKey);
+    protected static class CustomAWSCredentialsProvider implements AwsCredentialsProvider {
+
+        private final String accessKey;
+        private final String secretKey;
+
+        /**
+         * Constructor for CustomAWSCredentialsProvider.
+         *
+         * @param accessKey AWS access key.
+         * @param secretKey AWS secret key.
+         */
+        public CustomAWSCredentialsProvider(String accessKey, String secretKey) {
+            this.accessKey = accessKey;
+            this.secretKey = secretKey;
+        }
+
+        /**
+         * Resolves and returns AWS credentials.
+         *
+         * @return AwsBasicCredentials instance with the provided access key and secret key.
+         */
+        @Override
+        public AwsBasicCredentials resolveCredentials() {
+            boolean isAwsCredentialsSet = this.accessKey != null
+                    && this.secretKey != null;
+            log.info("AWS Credentials set? {}", isAwsCredentialsSet);
+            return AwsBasicCredentials.create(this.accessKey, this.secretKey);
+        }
     }
 }

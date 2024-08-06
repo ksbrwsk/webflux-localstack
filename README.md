@@ -64,9 +64,17 @@ config:
 ./mvnw package
 java -jar ./target/weflux-localstack-2.1.0.jar
 ```
-### Upload file eg (using HTTPie)
+### List files in bucket
 ```bash
 http :8080/api/s3                                 # List objects in bucket
+```
+
+### Upload file to bucket
+```bash
 http -f post :8080/api/s3/upload files@~/aaa.txt  # Upload a file to bucket
+```
+
+### Download file from bucket
+```bash
 http :8080/api/s3/download/aaa.txt                # Download a file from bucket
 ```

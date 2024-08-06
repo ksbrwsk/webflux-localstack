@@ -11,15 +11,16 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 
 /**
  * Configuration class for AWS S3 Router.
- * This class is responsible for defining the routes for AWS S3 operations.
+ * This class defines the routing for AWS S3 related HTTP endpoints.
  */
 @Configuration
 public class AwsS3Router {
 
     /**
-     * Defines the routes for AWS S3 operations.
-     * @param s3Handler The handler for AWS S3 operations
-     * @return RouterFunction instance
+     * Defines the router function for handling AWS S3 related HTTP requests.
+     *
+     * @param s3Handler the handler for AWS S3 operations
+     * @return a RouterFunction that routes requests to the appropriate handler methods
      */
     @Bean
     RouterFunction<ServerResponse> http(AwsS3Handler s3Handler) {

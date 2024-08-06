@@ -1,7 +1,5 @@
 package de.ksbrwsk.localstack;
 
-import com.amazonaws.services.s3.model.S3ObjectSummary;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
@@ -19,49 +17,33 @@ import java.util.List;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 
-/**
- * Handler class for AWS S3 operations.
- * This class is responsible for handling requests related to AWS S3 operations.
- */
 @Component
 @Slf4j
-@RequiredArgsConstructor
 public class AwsS3Handler {
     // AWS S3 service instance
     private final AwsS3Service awsS3Service;
 
-    /**
-     * Handles the request to fetch all objects in the AWS S3 bucket.
-     * @param serverRequest The server request
-     * @return ServerResponse instance
-     */
-    Mono<ServerResponse> handleFetchAll(ServerRequest serverRequest) {
-        log.info("handle request {} - {}", serverRequest.method(), serverRequest.requestPath());
-        List<S3ObjectSummary> s3ObjectSummaries = this.awsS3Service.listObjects();
-        return ok()
-                .bodyValue(s3ObjectSummaries);
+    public AwsS3Handler(AwsS3Service awsS3Service) {
+        this.awsS3Service = awsS3Service;
     }
 
-    /**
-     * Handles the request to download a file from the AWS S3 bucket.
-     * @param serverRequest The server request
-     * @return ServerResponse instance
-     */
+    Mono<ServerResponse> handleFetchAll(ServerRequest serverRequest) {
+        log.info("handle request {} - {}", serverRequest.method(), serverRequest.requestPath());
+        List<String> s3Resources = this.awsS3Service.listObjects();
+        return ok()
+                .bodyValue(s3Resources);
+    }
+
     Mono<ServerResponse> downloadFromS3(ServerRequest serverRequest) {
         log.info("handle request {} - {}", serverRequest.method(), serverRequest.requestPath());
         String name = serverRequest.pathVariable("name");
         InputStreamResource inputStreamResource =
-                new InputStreamResource(awsS3Service.downloadFileFromS3Bucket(name));
+                new InputStreamResource(this.awsS3Service.downloadFileFromS3Bucket(name));
         return ok()
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(BodyInserters.fromResource(inputStreamResource));
     }
 
-    /**
-     * Handles the request to upload a file to the AWS S3 bucket.
-     * @param serverRequest The server request
-     * @return ServerResponse instance
-     */
     Mono<ServerResponse> handleUpload(ServerRequest serverRequest) {
         log.info("handle request {} - {}", serverRequest.method(), serverRequest.requestPath());
         return serverRequest
@@ -82,20 +64,17 @@ public class AwsS3Handler {
                                                                                 new byte[dataBuffer.readableByteCount()].length > 0)
                                                                 .flatMap(
                                                                         dataBuffer -> {
-                                                                            log.info("Upload file '{}' started", fileName);
-
-                                                                            String etag = "";
+                                                                            log.info("Uploading file '{}' started", fileName);
+                                                                            String filename = "";
                                                                             try {
                                                                                 byte[] data = new byte[dataBuffer.readableByteCount()];
                                                                                 dataBuffer.read(data);
-                                                                                etag = awsS3Service.uploadObjectToS3(fileName, data);
+                                                                                filename = awsS3Service.uploadObjectToS3(fileName, data);
                                                                                 log.info("Upload file '{}' finished", fileName);
                                                                             } catch (Exception ex) {
                                                                                 log.info("Upload file '{}' failed", fileName, ex);
                                                                             }
-
-                                                                            return Mono.just(etag);
-
+                                                                            return Mono.just(filename);
                                                                         });
                                                     });
                             return ok()
