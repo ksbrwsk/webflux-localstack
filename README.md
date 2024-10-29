@@ -44,37 +44,36 @@ SERVICES=s3 DEFAULT_REGION=eu-central-1 DATA_DIR=~/localstack_data_dir localstac
 ```
 ### Create Bucket
 ```bash
-awslocal s3 mb s3://sabo-s3-bucket
+$ awslocal s3api create-bucket --bucket sabo-s3-bucket
+$ awslocal s3api list-buckets
 ```
-### Edit application configuration to edit localstack properties
-```bash
-src/main/reources/application.yml
-
-config:
+### Edit application configuration to edit localstack properties (src/main/reources/application.yml)
+```yaml
+cloud:
   aws:
     region: eu-central-1
     s3:
-      url: http://127.0.0.1:4566    #Default Localstack URL
-      bucket-name: sabo-s3-bucket   #Name of the bucket you created previously
+      url: http://127.0.0.1:4566
       access-key: test
       secret-key: test
+      bucket-name: sabo-s3-bucket
 ```
 ### Build & run the application
 ```bash
 ./mvnw package
 java -jar ./target/weflux-localstack-2.1.0.jar
 ```
-### List files in bucket
+### List files in bucket 
 ```bash
-http :8080/api/s3                                 # List objects in bucket
+http :8080/api/s3
 ```
 
 ### Upload file to bucket
 ```bash
-http -f post :8080/api/s3/upload files@~/aaa.txt  # Upload a file to bucket
+http -f post :8080/api/s3/upload files@~/aaa.txt
 ```
 
 ### Download file from bucket
 ```bash
-http :8080/api/s3/download/aaa.txt                # Download a file from bucket
+http :8080/api/s3/download/aaa.txt
 ```
