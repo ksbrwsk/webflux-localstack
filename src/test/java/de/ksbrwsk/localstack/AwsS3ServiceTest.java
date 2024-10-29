@@ -34,7 +34,7 @@ class AwsS3ServiceTest {
 
     @Container
     static final LocalStackContainer localstack =
-            new LocalStackContainer(DockerImageName.parse("localstack/localstack:3.6.0"))
+            new LocalStackContainer(DockerImageName.parse("localstack/localstack:3.8.1"))
                     .withServices(S3);
 
     @DynamicPropertySource
@@ -48,7 +48,7 @@ class AwsS3ServiceTest {
 
     @BeforeAll
     static void beforeAll() throws IOException, InterruptedException {
-        localstack.execInContainer("awslocal", "s3", "mb", "s3://sabo-s3-bucket");
+        localstack.execInContainer("awslocal", "s3api", "create-bucket", "--bucket", "sabo-s3-bucket");
     }
 
     @Test
