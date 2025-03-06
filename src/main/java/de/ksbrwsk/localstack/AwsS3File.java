@@ -1,6 +1,6 @@
 package de.ksbrwsk.localstack;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * Record representing an AWS S3 file.
@@ -13,5 +13,5 @@ import java.util.Date;
 public record AwsS3File(
         String bucketName,
         String file,
-        Date lastModified) {
+        LocalDateTime lastModified) {
 }

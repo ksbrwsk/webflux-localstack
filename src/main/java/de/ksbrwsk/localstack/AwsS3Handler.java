@@ -29,7 +29,7 @@ public class AwsS3Handler {
 
     Mono<ServerResponse> handleFetchAll(ServerRequest serverRequest) {
         log.info("handle request {} - {}", serverRequest.method(), serverRequest.requestPath());
-        List<String> s3Resources = this.awsS3Service.listObjects();
+        var s3Resources = this.awsS3Service.listFiles();
         return ok()
                 .bodyValue(s3Resources);
     }

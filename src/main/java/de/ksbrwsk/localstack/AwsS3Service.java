@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 /**
@@ -67,6 +70,27 @@ public class AwsS3Service {
                 .map(S3Resource::getFilename)
                 .toList();
         return resources;
+    }
+
+    public List<AwsS3File> listFiles() {
+        log.info("Retrieving files for bucket '{}'", this.bucketName);
+        List<S3Resource> s3Resources = this.s3Template.listObjects(this.bucketName, "");
+        return s3Resources.stream()
+                .map(s3Resource -> new AwsS3File(this.bucketName,
+                        s3Resource.getFilename(),
+                        longToLocalDateTime(s3Resource.lastModified())))
+                .toList();
+    }
+
+    /**
+     * Converts a long value to a LocalDateTime instance.
+     *
+     * @param value the long value to convert
+     * @return the LocalDateTime instance representing the long value
+     */
+    private static LocalDateTime longToLocalDateTime(long value) {
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(value),
+                ZoneId.systemDefault());
     }
 
     /**
